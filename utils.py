@@ -36,3 +36,9 @@ def write_data_to_file(file, data, separator, append=False):
 
 def input_to_output(input_file):
     return input_file.replace('input', 'output').replace('.in', '.out')
+
+
+def binary_kingdoms_from_list(neighbors_list, original):
+    for i in neighbors_list:
+        original = original & (1 << i)
+    return original

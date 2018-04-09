@@ -4,7 +4,7 @@ sys.path.append('..')
 sys.path.append('../..')
 import argparse
 import utils
-from utils_sp18 import *
+from student_utils_sp18 import *
 
 """
 ======================================================================
@@ -24,8 +24,36 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     Output:
         Return 2 things. The first is a list of kingdoms representing the walk, and the second is the set of kingdoms that are conquered
     """
-    raise Exception('"solve" function not defined')
-    # return closed_walk, conquered_kingdoms
+    N = len(list_of_kingdom_names)
+    KINGDOM_POSS = 2 ** N
+    G = nx.Graph()
+
+    # print(list_of_kingdom_names)
+    # print(starting_kingdom)
+    # print(adjacency_matrix)
+    edge_list = adjacency_matrix_to_edge_list(adjacency_matrix)
+    # print(edge_list)
+
+    for kingdom_index in range(N):
+        for i in range(KINGDOM_POSS):
+            G.add_node((kingdom_index, i))
+
+    for i in range(N):
+        for j in range(i, N):
+            if i == j:
+                for k in range(KINGDOM_POSS):
+                    G.add_edge((i, k), (i, utils.binary_kingdoms_from_list(edge_list[i], k)), {'cost': adjacency_matrix[i][j]})
+
+    # import matplotlib.pyplot as plt
+    # nx.draw(G)
+    #nx.draw(G, pos=nx.circular_layout(G), nodecolor='r', edge_color='b')
+    for e in list(G.edges()):
+        print(e)
+
+    closed_walk = []
+    conquered_kingdoms = set(list_of_kingdom_names)
+    # raise Exception('"solve" function not defined')
+    return closed_walk, conquered_kingdoms
 
 
 """
