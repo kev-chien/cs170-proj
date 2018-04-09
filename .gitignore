@@ -1,0 +1,7 @@
+# byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# misc
+.DS_Store
