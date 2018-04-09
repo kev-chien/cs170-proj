@@ -55,8 +55,33 @@ def adjacency_matrix_to_edge_list(adjacency_matrix):
     return edge_list
 
 
+def adjacency_matrix_to_adjacency_lists(adjacency_matrix):
+    adjacency_lists = []
+    for i in range(len(adjacency_matrix)):
+        adjacency_lists.append([])
+        for j in range(len(adjacency_matrix[0])):
+            if adjacency_matrix[i][j] != 'x':
+                adjacency_lists[i].append(j)
+    return adjacency_lists
+
 def tour_to_list_of_edges(tour):
     list_of_edges = []
     for vertex_index in range(len(tour) - 1):
         list_of_edges.append((tour[vertex_index], tour[vertex_index + 1]))
     return list_of_edges
+
+def kingdoms_state_after_conquer(neighbors_list, original):
+    """Return kingdoms where all neighbors have surrendered, in binary
+    >>> kingdoms_state_after_conquer([0,1], 0)
+    3
+    >>> kingdoms_state_after_conquer([0,1,2], 1)
+    7
+    """
+    new = original
+    for i in neighbors_list:
+        new = new | (1 << i)
+    return new
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

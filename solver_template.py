@@ -28,30 +28,69 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     KINGDOM_POSS = 2 ** N
     G = nx.Graph()
 
+    dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
+    dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
+    
+    starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
+
     # print(list_of_kingdom_names)
     # print(starting_kingdom)
     # print(adjacency_matrix)
-    edge_list = adjacency_matrix_to_edge_list(adjacency_matrix)
-    # print(edge_list)
+    adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
+    # print(adjacency_lists)
 
+    # Our graph takes in nodes of tuple of 0: kingdom_index (0 to n-1), 
+    # and 1: kingdoms_state which describes which kingdoms have surrendered
+    # in binary
     for kingdom_index in range(N):
-        for i in range(KINGDOM_POSS):
-            G.add_node((kingdom_index, i))
+        for kingdoms_state in range(KINGDOM_POSS):
+            G.add_node((kingdom_index, kingdoms_state))
 
+    # adding edges for conquering kingdoms
     for i in range(N):
-        for j in range(i, N):
-            if i == j:
-                for k in range(KINGDOM_POSS):
-                    G.add_edge((i, k), (i, utils.binary_kingdoms_from_list(edge_list[i], k)), {'cost': adjacency_matrix[i][j]})
+        adj_list = adjacency_lists[i]
+        for k_state in range(KINGDOM_POSS):
+            kingdoms_i_conquered = kingdoms_state_after_conquer(adj_list, k_state)
+            if kingdoms_i_conquered != k_state:
+                G.add_edge((i, k_state), \
+                           (i, kingdoms_i_conquered), \
+                           weight=adjacency_matrix[i][i])
+    
+    # adding edges for taking roads
+    for i in range(N):
+        for j in range(i + 1, N):
+            if adjacency_matrix[i][j] != 'x':
+                for k_state in range(KINGDOM_POSS):
+                    G.add_edge((i, k_state), \
+                            (j, k_state), \
+                            weight=adjacency_matrix[i][j])
 
     # import matplotlib.pyplot as plt
     # nx.draw(G)
-    #nx.draw(G, pos=nx.circular_layout(G), nodecolor='r', edge_color='b')
-    for e in list(G.edges()):
-        print(e)
+    # nx.draw(G, pos=nx.circular_layout(G), nodecolor='r', edge_color='b')
 
-    closed_walk = []
-    conquered_kingdoms = set(list_of_kingdom_names)
+    # print edges for debugging
+    for u,v,weight in G.edges.data('weight'):
+        print(u,v,weight)
+
+    # run astar
+    path = nx.algorithms.astar_path(G, (starting_kingdom_index, 0), (starting_kingdom_index, KINGDOM_POSS - 1))
+    print(path)
+
+    # convert path to walk and kingdoms conquered
+    closed_walk = [starting_kingdom]
+    conquered_kingdoms = []
+
+    prevKingdom, prevState = path[0]
+    for i in range(1, len(path)):
+        currKingdom, currState = path[i]
+        if currKingdom != prevKingdom:
+            closed_walk.append(dict_kingdom_index_to_name[currKingdom])
+        elif currState != prevState:
+            conquered_kingdoms.append(dict_kingdom_index_to_name[currKingdom])
+        else:
+            raise Exception('node cycled back to self')
+        prevKingdom, prevState = currKingdom, currState
     # raise Exception('"solve" function not defined')
     return closed_walk, conquered_kingdoms
 
