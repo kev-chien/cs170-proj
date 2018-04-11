@@ -23,5 +23,5 @@ def print_matrix(matrix):
         print(rowString)
 
 
-print(np.arange(50))
-print_matrix(random_graph(50))
+print(np.arange(20))
+print_matrix(random_graph(20))

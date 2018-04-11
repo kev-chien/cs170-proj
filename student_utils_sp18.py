@@ -82,6 +82,39 @@ def kingdoms_state_after_conquer(neighbors_list, original):
         new = new | (1 << i)
     return new
 
+def isSurrendered(G, kingdom_name):
+    """ Returns whether a kingdom has surrendered """
+    return kingdom_name not in G[kingdom_name]
+
+def checkSurrendered(G):
+    """ Returns whether all kingdoms have surrendered """
+    for kingdom in G.keys():
+        if not isSurrendered(G, kingdom):
+            return False
+    return True
+
+def conquer(G, kingdom_name, conquered_kingdoms):
+    """ Conquers by adding kingdom to conquered_kingdoms list, surrenders kingdoms by removing self edge"""
+    return conquered_kingdoms + kingdom_name, surrenderKingdoms(G, kingdom_name)
+
+def surrenderKingdoms(G, kingdom_name):
+    """ Neighbors around a kingdom and that kingdom that is conquered surrender """
+    for kingdom in G[kingdom_name]:
+        if kingdom_name in G[kingdom]:
+            G[kingdom].remove(kingdom_name)
+    return G
+
+def getKingdomCost(G, kingdom_name):
+    """ Returns cost of conquering a kingdom """
+    return G[kingdom_name][kingdom_name]["weight"]
+
+def mapKingdomtoCost(G, list_of_kingdom_names):
+    """ Creates a dictionary that maps kingdoms to cost to conquer """
+    cost_to_conquer_dict = {}
+    for kingdom in list_of_kingdom_names:
+        cost_to_conquer_dict[kingdom] = getKingdomCost(G, kingdom)
+    return cost_to_conquer_dict
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
