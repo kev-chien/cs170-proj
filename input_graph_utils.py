@@ -111,7 +111,7 @@ if __name__ == '__main__':
     kg.addConquerCost(1,1)
     kg.addConquerCost(2,2)
 
-    kingdomGraphToInputFile("test_kgbuilder_input.in", kg)
+    kingdomGraphToInputFile("50_lawrence.in", kg)
 
     # test drawing graph
     input_file = "in/sample_input.in"
