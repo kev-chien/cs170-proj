@@ -39,9 +39,9 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
     # print(adjacency_lists)
 
-    # Our graph takes in nodes of tuple of 0: kingdom_index (0 to n-1), 
-    # and 1: kingdoms_state which describes which kingdoms have surrendered
-    # in binary
+    # Our graph G has nodes of tuples, form:
+    # 0: kingdom_index (0 to n-1)
+    # 1: kingdoms_state which describes which kingdoms have surrendered in binary
 
     # A* Method
 

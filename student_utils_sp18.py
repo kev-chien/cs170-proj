@@ -3,6 +3,8 @@ from networkx.algorithms import approximation
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import utils
+# from input_graph_utils import *
 
 random.seed(3)
 
@@ -70,18 +72,20 @@ def tour_to_list_of_edges(tour):
         list_of_edges.append((tour[vertex_index], tour[vertex_index + 1]))
     return list_of_edges
 
-def kingdoms_state_after_conquer(neighbors_list, original):
+# A* helper function
+def kingdoms_state_after_conquer(neighbors_list, original_state):
     """Return kingdoms where all neighbors have surrendered, in binary
-    >>> kingdoms_state_after_conquer([0,1], 0)
+    >>> kingdoms_state_after_conquer([0,1], 0b000)
     3
-    >>> kingdoms_state_after_conquer([0,1,2], 1)
+    >>> kingdoms_state_after_conquer([0,1,2], 0b001)
     7
     """
-    new = original
+    new = original_state
     for i in neighbors_list:
         new = new | (1 << i)
     return new
 
+# Dijkstra functions
 def isSurrendered(G, kingdom_name):
     """ Returns whether a kingdom has surrendered """
     return kingdom_name not in G[kingdom_name]
@@ -114,6 +118,8 @@ def mapKingdomtoCost(G, list_of_kingdom_names):
     for kingdom in list_of_kingdom_names:
         cost_to_conquer_dict[kingdom] = getKingdomCost(G, kingdom)
     return cost_to_conquer_dict
+
+
 
 if __name__ == '__main__':
     import doctest
