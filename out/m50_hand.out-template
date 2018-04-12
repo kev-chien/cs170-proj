@@ -3,7 +3,7 @@ walk: k1 k3 k6 k5 k4 k5 k8
 conquer: k3, k4
 
 cluster northeast: k5 to k18
-walk: k5 k8 k9 k10 k13 k10 k14 k15 k14 k18
+walk: k5 k8 k13 k10 k14 k15 k14 k18
 conquer: k8 k13 k14 k15
 
 cluster east: k18 back to k18
@@ -28,7 +28,7 @@ conquer: k38 k44 k46 k49 k50 k7
 # combined
 combined walk:
 walk: k1 k3 k6 k5 k4 k5 k8
-walk: k8 k9 k10 k13 k10 k14 k15 k14 k18
+walk: k8 k13 k10 k14 k15 k14 k18
 walk: k18 k21 k23 k21 k18 k20 k22 k24 k22 k20 k19 k20 k18
 walk: k18 k14 k10 k13 k8 k5 k6 k7 k27
 walk: k27 k29 k30 k30 k29 k32 k33 

@@ -5,7 +5,7 @@ sys.path.append('..')
 sys.path.append('../..')
 import argparse
 import utils
-from utils_sp18 import *
+from utils import *
 from student_utils_sp18 import *
 
 
