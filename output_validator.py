@@ -58,19 +58,16 @@ def tests(input_data, output_data, params=[]):
 
     # Check whether kingdoms are all surrendered
 
-    for ck in conquered_kingdoms:
-        kingdom_domain = ck[0]
-        if kingdom_domain == 'l':
-            domain_adder = 0
-        else:
-            domain_adder = 50
-        kingdom_pos = int(ck[1:]) - 1 + domain_adder
+    for name in conquered_kingdoms:
+        kingdom_pos = list_of_kingdom_names.index(name)
         for i in range(len(adjacency_matrix)):
             if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
                 adjacency_matrix[i][i] = 'x'
 
-    if any([adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]):
-         print('You have some kingdoms that have not surrendered!')
+    not_surrendered = [adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]
+    if any(not_surrendered):
+        print('You have some kingdoms that have not surrendered!')
+        print([i for i in range(len(adjacency_matrix)) if not_surrendered[i]])
 
     return("Success!")
 
