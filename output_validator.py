@@ -57,8 +57,14 @@ def tests(input_data, output_data, params=[]):
         print('The kingdoms you listed do not form a valid tour in the graph')
 
     # Check whether kingdoms are all surrendered
+
     for ck in conquered_kingdoms:
-        kingdom_pos = int(ck[1:]) - 1
+        kingdom_domain = ck[0]
+        if kingdom_domain == 'l':
+            domain_adder = 0
+        else:
+            domain_adder = 50
+        kingdom_pos = int(ck[1:]) - 1 + domain_adder
         for i in range(len(adjacency_matrix)):
             if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
                 adjacency_matrix[i][i] = 'x'
