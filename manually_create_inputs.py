@@ -148,7 +148,7 @@ if __name__ == '__main__':
     # kg = KingdomGraph(50, starting_kingdom="k1", kingdom_names=['k{}'.format(i+1) for i in range(50)])
     
     # kingdom conquer costs
-    kg.addConquerCostByName('k1',35)
+    kg.addConquerCostByName('k1',1000)
     kg.addConquerCostByName('k2',3)
     kg.addConquerCostByName('k3',5)
     kg.addConquerCostByName('k4',10)
@@ -200,6 +200,8 @@ if __name__ == '__main__':
     kg.addConquerCostByName('k50',10)
 
     # edge costs
+    # connect Lawrence and Kevin's
+    kg.addEdgeByName('k1','l1',1)
     # northwest
     kg.addEdgeByName('k1','k4',5)
     kg.addEdgeByName('k1','k2',10)
