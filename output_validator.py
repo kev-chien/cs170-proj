@@ -52,13 +52,20 @@ def tests(input_data, output_data, params=[]):
 
     list_of_edges_in_tour = tour_to_list_of_edges(kingdom_tour)
     kingdom_name_to_index = lambda name : list_of_kingdom_names.index(name)
+    kingdom_index_to_name = lambda index : list_of_kingdom_names[index]
     edges_in_tour_by_index = list(map(lambda edge : (kingdom_name_to_index(edge[0]), kingdom_name_to_index(edge[1])), list_of_edges_in_tour))
     edges_valid = [adjacency_matrix[edge[0]][edge[1]] != 'x' for edge in edges_in_tour_by_index]
     edges_to_self = [edge[0] == edge[1] for edge in edges_in_tour_by_index]
     if not all(edges_valid) or any(edges_to_self):
         print('The kingdoms you listed do not form a valid tour in the graph')
-        print('Nonexistent edges, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(list_of_edges_in_tour)) if not edges_valid[i]])
-        print('Edges of kingdom to self, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(list_of_edges_in_tour)) if edges_to_self[i]])
+        print('Nonexistent edges by index and name, and edge index in walk:')
+        for i in range(len(list_of_edges_in_tour)):
+            if not edges_valid[i]:
+                print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
+        print('Edges of kingdom to self by index and name, and edge index:')
+        for i in range(len(list_of_edges_in_tour)):
+            if edges_to_self[i]:
+                print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
 
     # Check whether kingdoms are all surrendered
 
