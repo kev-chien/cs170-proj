@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # for 100 kingdoms:
     # kg = KingdomGraph(100, starting_kingdom="l1", kingdom_names=['l{}'.format(i+1) for i in range(50)] +['k{}'.format(i+1) for i in range(50)])
     
-    for 200 kingdoms:
+    # for 200 kingdoms:
     kg = KingdomGraph(200,
                       starting_kingdom="l1",
                       kingdom_names=['l{}'.format(i+1) for i in range(50)] \
