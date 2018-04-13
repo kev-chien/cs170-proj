@@ -219,7 +219,7 @@ if __name__ == '__main__':
     # northwest
     kg.addEdgeByName('k1','k4',5)
     kg.addEdgeByName('k1','k2',10)
-    kg.addEdgeByName('k1','k3',18)
+    kg.addEdgeByName('k1','k3',8)
     kg.addEdgeByName('k3','k6',6)
     kg.addEdgeByName('k2','k7',5)
     kg.addEdgeByName('k4','k5',2)
@@ -477,7 +477,7 @@ if __name__ == '__main__':
     # northwest
     kg.addEdgeByName('K1','K4',5)
     kg.addEdgeByName('K1','K2',10)
-    kg.addEdgeByName('K1','K3',18)
+    kg.addEdgeByName('K1','K3',8)
     kg.addEdgeByName('K3','K6',6)
     kg.addEdgeByName('K2','K7',5)
     kg.addEdgeByName('K4','K5',2)
