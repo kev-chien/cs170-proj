@@ -23,7 +23,7 @@ if __name__ == '__main__':
     # for 100 kingdoms:
     # kg = KingdomGraph(100, starting_kingdom="l1", kingdom_names=['l{}'.format(i+1) for i in range(50)] +['k{}'.format(i+1) for i in range(50)])
     
-    # for 200 kingdoms:
+    for 200 kingdoms:
     kg = KingdomGraph(200,
                       starting_kingdom="l1",
                       kingdom_names=['l{}'.format(i+1) for i in range(50)] \
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     kg.addEdgeByName('l48', 'l49', 2)
     kg.addEdgeByName('l49', 'l50', 21)
 
-    kingdomGraphToInputFile("50_lawrence.in", kg)
+    # kingdomGraphToInputFile("50_lawrence.in", kg)
 
     # kg = KingdomGraph(50, starting_kingdom="k1", kingdom_names=['k{}'.format(i+1) for i in range(50)])
     
@@ -285,10 +285,10 @@ if __name__ == '__main__':
 
 
 
-    kingdomGraphToInputFile("100.in", kg)
+    # kingdomGraphToInputFile("100.in", kg)
     # END of 100
     
-
+    
     # DUPLICATING 50 of Lawrence's kingdoms to create 150
     kg.addConquerCostByName('L1', 10000)
     kg.addConquerCostByName('L2', 9)
@@ -546,3 +546,4 @@ if __name__ == '__main__':
     # kingdomGraphToInputFile("50_lawrence.in", kg)
     # test drawing graph
     # drawFromKingdomGraph(kg)
+    
