@@ -405,8 +405,9 @@ if __name__ == '__main__':
     kg.addEdgeByName('L44', 'L46', 1)
     kg.addEdgeByName('L45', 'L46', 2)
     kg.addEdgeByName('L46', 'L47', 20)
-    kg.addEdgeByName('L46', 'L48', 2)
+    kg.addEdgeByName('L46', 'L48', 10)
     kg.addEdgeByName('L46', 'L49', 10)
+    kg.addEdgeByName('L48', 'L49', 2)
     kg.addEdgeByName('L49', 'L50', 21)
 
 
