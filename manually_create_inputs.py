@@ -88,7 +88,7 @@ if __name__ == '__main__':
     kg.addEdgeByName('l9', 'l10', 20)
     kg.addEdgeByName('l10', 'l11', 1)
     kg.addEdgeByName('l10', 'l12', 2)
-    kg.addEdgeByName('l11', 'l13', 8)
+    kg.addEdgeByName('l12', 'l13', 8)
     kg.addEdgeByName('l12', 'l14', 10)
     kg.addEdgeByName('l14', 'l15', 1)
 

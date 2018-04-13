@@ -56,6 +56,16 @@ def tests(input_data, output_data, params=[]):
     if not all(adjacency_matrix[edge[0]][edge[1]] for edge in edges_in_tour_by_index):
         print('The kingdoms you listed do not form a valid tour in the graph')
 
+    # Check whether kingdoms are all surrendered
+    for ck in conquered_kingdoms:
+        kingdom_pos = int(ck[1:]) - 1
+        for i in range(len(adjacency_matrix)):
+            if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
+                adjacency_matrix[i][i] = 'x'
+
+    if any([adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]):
+         print('You have some kingdoms that have not surrendered!')
+
     return("Success!")
 
 
