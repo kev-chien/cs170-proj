@@ -57,8 +57,8 @@ def tests(input_data, output_data, params=[]):
     edges_to_self = [edge[0] == edge[1] for edge in edges_in_tour_by_index]
     if not all(edges_valid) or any(edges_to_self):
         print('The kingdoms you listed do not form a valid tour in the graph')
-        print('Nonexistent edges, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(adjacency_matrix)) if not edges_valid[i]])
-        print('Edges of kingdom to self, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(adjacency_matrix)) if edges_to_self[i]])
+        print('Nonexistent edges, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(list_of_edges_in_tour)) if not edges_valid[i]])
+        print('Edges of kingdom to self, and edge index:', [(edges_in_tour_by_index[i],i) for i in range(len(list_of_edges_in_tour)) if edges_to_self[i]])
 
     # Check whether kingdoms are all surrendered
 
