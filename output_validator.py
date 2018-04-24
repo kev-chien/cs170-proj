@@ -63,44 +63,43 @@ def tests(input_data, output_data, params=[]):
         message += 'At least one name in your conquered set does not belong to the tour\n'
         cost = 'infinite'
 
-    kingdom_tour = convert_kingdom_names_to_indices(kingdom_tour, list_of_kingdom_names)
-    conquered_kingdoms = convert_kingdom_names_to_indices(conquered_kingdoms, list_of_kingdom_names)
-
-    # list_of_edges_in_tour = tour_to_list_of_edges(kingdom_tour)
-    # kingdom_name_to_index = lambda name : list_of_kingdom_names.index(name)
-    # kingdom_index_to_name = lambda index : list_of_kingdom_names[index]
-    # edges_in_tour_by_index = list(map(lambda edge : (kingdom_name_to_index(edge[0]), kingdom_name_to_index(edge[1])), list_of_edges_in_tour))
-    # edges_valid = [adjacency_matrix[edge[0]][edge[1]] != 'x' for edge in edges_in_tour_by_index]
-    # edges_to_self = [edge[0] == edge[1] for edge in edges_in_tour_by_index]
-    # if not all(edges_valid) or any(edges_to_self):
-    #     print('The kingdoms you listed do not form a valid tour in the graph')
-    #     print('Nonexistent edges by index and name, and edge index in walk:')
-    #     for i in range(len(list_of_edges_in_tour)):
-    #         if not edges_valid[i]:
-    #             print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
-    #     print('Edges of kingdom to self by index and name, and edge index:')
-    #     for i in range(len(list_of_edges_in_tour)):
-    #         if edges_to_self[i]:
-    #             print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
-    #
-    # # Check whether kingdoms are all surrendered
-    #
-    # for name in conquered_kingdoms:
-    #     kingdom_pos = list_of_kingdom_names.index(name)
-    #     for i in range(len(adjacency_matrix)):
-    #         if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
-    #             adjacency_matrix[i][i] = 'x'
-    #
-    # not_surrendered = [adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]
-    # if any(not_surrendered):
-    #     print('You have some kingdoms that have not surrendered!')
-    #     print([i for i in range(len(adjacency_matrix)) if not_surrendered[i]])
+    list_of_edges_in_tour = tour_to_list_of_edges(kingdom_tour)
+    kingdom_name_to_index = lambda name : list_of_kingdom_names.index(name)
+    kingdom_index_to_name = lambda index : list_of_kingdom_names[index]
+    edges_in_tour_by_index = list(map(lambda edge : (kingdom_name_to_index(edge[0]), kingdom_name_to_index(edge[1])), list_of_edges_in_tour))
+    edges_valid = [adjacency_matrix[edge[0]][edge[1]] != 'x' for edge in edges_in_tour_by_index]
+    edges_to_self = [edge[0] == edge[1] for edge in edges_in_tour_by_index]
+    if not all(edges_valid) or any(edges_to_self):
+        print('The kingdoms you listed do not form a valid tour in the graph')
+        print('Nonexistent edges by index and name, and edge index in walk:')
+        for i in range(len(list_of_edges_in_tour)):
+            if not edges_valid[i]:
+                print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
+        print('Edges of kingdom to self by index and name, and edge index:')
+        for i in range(len(list_of_edges_in_tour)):
+            if edges_to_self[i]:
+                print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
+    
+    # Check whether kingdoms are all surrendered
+    
+    for name in conquered_kingdoms:
+        kingdom_pos = list_of_kingdom_names.index(name)
+        for i in range(len(adjacency_matrix)):
+            if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
+                adjacency_matrix[i][i] = 'x'
+    
+    not_surrendered = [adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]
+    if any(not_surrendered):
+        print('You have some kingdoms that have not surrendered!')
+        print([i for i in range(len(adjacency_matrix)) if not_surrendered[i]])
 
     if (kingdom_tour[0] != kingdom_tour[-1]):
         message += "Your tour must start and end at the same kingdom\n"
         cost = 'infinite'
     
     if cost != 'infinite':
+        kingdom_tour = convert_kingdom_names_to_indices(kingdom_tour, list_of_kingdom_names)
+        conquered_kingdoms = convert_kingdom_names_to_indices(conquered_kingdoms, list_of_kingdom_names)
         cost, solution_message = cost_of_solution(G, kingdom_tour, conquered_kingdoms)
         message += solution_message
 
