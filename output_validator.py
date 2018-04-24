@@ -81,13 +81,12 @@ def tests(input_data, output_data, params=[]):
                 print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
     
     # Check whether kingdoms are all surrendered
-    
     for name in conquered_kingdoms:
         kingdom_pos = list_of_kingdom_names.index(name)
         for i in range(len(adjacency_matrix)):
             if adjacency_matrix[i][kingdom_pos] != 'x' or adjacency_matrix[kingdom_pos][i] != 'x':
                 adjacency_matrix[i][i] = 'x'
-    
+
     not_surrendered = [adjacency_matrix[i][i] != 'x' for i in range(len(adjacency_matrix))]
     if any(not_surrendered):
         print('You have some kingdoms that have not surrendered!')

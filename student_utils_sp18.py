@@ -86,28 +86,30 @@ def kingdoms_state_after_conquer(neighbors_list, original_state):
         new = new | (1 << i)
     return new
 
-# Dijkstra functions
+# Greedy Algorithm Functions
 def isSurrendered(G, kingdom_name):
     """ Returns whether a kingdom has surrendered """
-    return kingdom_name not in G[kingdom_name]
+    return kingdom_name not in G
 
-def checkSurrendered(G):
+def areAllSurrendered(matrix):
     """ Returns whether all kingdoms have surrendered """
-    for kingdom in G.keys():
-        if not isSurrendered(G, kingdom):
-            return False
-    return True
+    return all(matrix[i][i] == 'x' for i in range(len(matrix)))
 
-def conquer(G, kingdom_name, conquered_kingdoms):
+def conquer(matrix, kingdom_name, conquered_kingdoms):
     """ Conquers by adding kingdom to conquered_kingdoms list, surrenders kingdoms by removing self edge"""
-    return conquered_kingdoms + kingdom_name, surrenderKingdoms(G, kingdom_name)
+    conquered_kingdoms.append(kingdom_name)
+    return conquered_kingdoms, surrenderKingdoms(matrix, kingdom_name)
 
-def surrenderKingdoms(G, kingdom_name):
+def surrenderKingdoms(matrix, kingdom_index):
     """ Neighbors around a kingdom and that kingdom that is conquered surrender """
-    for kingdom in G[kingdom_name]:
-        if kingdom_name in G[kingdom]:
-            G[kingdom].remove(kingdom_name)
-    return G
+    kingdoms_surrendered_indices = []
+    for i in range(len(matrix[kingdom_index])):
+        if matrix[kingdom_index][i] != 'x':
+            kingdoms_surrendered_indices.append(i)
+    for i in kingdoms_surrendered_indices:
+        matrix[i][i] = 'x'
+    matrix[kingdom_index][kingdom_index] = 'x'
+    return matrix
 
 def getKingdomCost(G, kingdom_name):
     """ Returns cost of conquering a kingdom """

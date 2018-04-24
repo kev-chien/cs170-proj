@@ -26,10 +26,13 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     """
     N = len(list_of_kingdom_names)
     KINGDOM_POSS = 2 ** N
-    G = nx.Graph()
+    # G = nx.from_numpy_matrix(np.array(adjacency_matrix))
+    adjacency_array = np.array(adjacency_matrix)
 
     dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
     dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
+
+    tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     
     starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
 
@@ -43,73 +46,21 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # 0: kingdom_index (0 to n-1)
     # 1: kingdoms_state which describes which kingdoms have surrendered in binary
 
-    # A* Method
+    # Steiner Tree Algorithm
+    sorted_kingdom_tuples_by_cost = sorted(tuples_kingdom_name_to_cost, key=lambda x: x[1])
+    sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_cost]
+    conquered_kingdoms_indices = ["dummy"]
+    while not areAllSurrendered(adjacency_array):
+        conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+    conquered_kingdoms_indices.pop(0)
 
-    for kingdom_index in range(N):
-        for kingdoms_state in range(KINGDOM_POSS):
-            G.add_node((kingdom_index, kingdoms_state))
+    conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
 
-    # adding edges for conquering kingdoms
-    for i in range(N):
-        adj_list = adjacency_lists[i]
-        for k_state in range(KINGDOM_POSS):
-            kingdoms_i_conquered = kingdoms_state_after_conquer(adj_list, k_state)
-            if kingdoms_i_conquered != k_state:
-                G.add_edge((i, k_state), (i, kingdoms_i_conquered), weight=adjacency_matrix[i][i])
 
-    # adding edges for taking roads
-    for i in range(N):
-        for j in range(i + 1, N):
-            if adjacency_matrix[i][j] != 'x':
-                for k_state in range(KINGDOM_POSS):
-                    G.add_edge((i, k_state), (j, k_state), weight=adjacency_matrix[i][j])
-
-    # import matplotlib.pyplot as plt
-    # nx.draw(G)
-    # nx.draw(G, pos=nx.circular_layout(G), nodecolor='r', edge_color='b')
-
-    # print edges for debugging
-    # for u,v,weight in G.edges.data('weight'):
-    #     print(u,v,weight)
-
-    # run astar
-    path = nx.algorithms.astar_path(G, (starting_kingdom_index, 0), (starting_kingdom_index, KINGDOM_POSS - 1))
-    print(path)
-
-    # convert path to walk and kingdoms conquered
-    closed_walk = [starting_kingdom]
-    conquered_kingdoms = []
-
-    prevKingdom, prevState = path[0]
-    for i in range(1, len(path)):
-        currKingdom, currState = path[i]
-        if currKingdom != prevKingdom:
-            closed_walk.append(dict_kingdom_index_to_name[currKingdom])
-        elif currState != prevState:
-            conquered_kingdoms.append(dict_kingdom_index_to_name[currKingdom])
-        else:
-            raise Exception('node cycled back to self')
-        prevKingdom, prevState = currKingdom, currState
-    # raise Exception('"solve" function not defined')
-
-    # Dijkstras
-    # Populate nodes in the graph
-    # for kingdom_name in list_of_kingdom_names:
-    #     G.add_node(kingdom_name)
-    #
-    # # Populate edges in the graph
-    # for i in range(N):
-    #     adj_list = adjacency_lists[i]
-    #     for j in adj_list:
-    #         G.add_edge(dict_kingdom_index_to_name[i], dict_kingdom_index_to_name[j], weight=adjacency_matrix[i][j])
-    #
-    # # Run dijkstras from the start node
-    # paths = nx.algorithms.single_source_dijkstra_path(G, starting_kingdom)
-    # print(G["Kanto"]["Kanto"])
-    # print(paths)
-    #
-    # print(G["Kanto"])
-    # # for kingdom_name in paths.keys():
+    # This part still doesn't work, need to fix how we are making the graph G
+    G = nx.from_numpy_matrix(np.array(adjacency_array))
+    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices)
+    print(st)
 
     return closed_walk, conquered_kingdoms
 
