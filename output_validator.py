@@ -79,9 +79,8 @@ def tests(input_data, output_data, params=[]):
         for i in range(len(list_of_edges_in_tour)):
             if edges_to_self[i]:
                 print(edges_in_tour_by_index[i],list_of_edges_in_tour[i],i)
-
+    
     # Check whether kingdoms are all surrendered
-
     for name in conquered_kingdoms:
         kingdom_pos = list_of_kingdom_names.index(name)
         for i in range(len(adjacency_matrix)):
