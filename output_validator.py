@@ -63,9 +63,6 @@ def tests(input_data, output_data, params=[]):
         message += 'At least one name in your conquered set does not belong to the tour\n'
         cost = 'infinite'
 
-    kingdom_tour = convert_kingdom_names_to_indices(kingdom_tour, list_of_kingdom_names)
-    conquered_kingdoms = convert_kingdom_names_to_indices(conquered_kingdoms, list_of_kingdom_names)
-
     list_of_edges_in_tour = tour_to_list_of_edges(kingdom_tour)
     kingdom_name_to_index = lambda name : list_of_kingdom_names.index(name)
     kingdom_index_to_name = lambda index : list_of_kingdom_names[index]
@@ -101,6 +98,8 @@ def tests(input_data, output_data, params=[]):
         cost = 'infinite'
     
     if cost != 'infinite':
+        kingdom_tour = convert_kingdom_names_to_indices(kingdom_tour, list_of_kingdom_names)
+        conquered_kingdoms = convert_kingdom_names_to_indices(conquered_kingdoms, list_of_kingdom_names)
         cost, solution_message = cost_of_solution(G, kingdom_tour, conquered_kingdoms)
         message += solution_message
 
