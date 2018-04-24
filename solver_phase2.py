@@ -58,9 +58,11 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
 
 
     # This part still doesn't work, need to fix how we are making the graph G
-    G = nx.from_numpy_matrix(np.array(adjacency_array))
+    G = adjacency_matrix_to_graph(adjacency_matrix)
     st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices)
-    print(st)
+    # for node, datadict in st.nodes.items():
+    #     print(node)
+    
 
     return closed_walk, conquered_kingdoms
 
