@@ -5,6 +5,7 @@ sys.path.append('../..')
 import argparse
 import utils
 from student_utils_sp18 import *
+# from queue import Queue
 
 """
 ======================================================================
@@ -49,20 +50,44 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # Steiner Tree Algorithm
     sorted_kingdom_tuples_by_cost = sorted(tuples_kingdom_name_to_cost, key=lambda x: x[1])
     sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_cost]
-    conquered_kingdoms_indices = ["dummy"]
-    while not areAllSurrendered(adjacency_array):
-        conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
-    conquered_kingdoms_indices.pop(0)
+    # conquered_kingdoms_indices = ["dummy"]
+
+
+    # Kevin's implementation
+    set_surrendered_indices = set()
+    conquered_kingdoms_indices = []
+    while len(set_surrendered_indices) < N:
+        # pop of next
+        tentative_conquer_name = sorted_kingdom_names.pop(0)
+        tentative_conquer_index = dict_kingdom_name_to_index[tentative_conquer_name]
+        # test if conquering actually forces new kingdoms to surrender
+        helpful = False
+        for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+            if kingdom not in set_surrendered_indices:
+                helpful = True
+                break
+        if helpful:
+            conquered_kingdoms_indices.append(tentative_conquer_index)
+            for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+                set_surrendered_indices.add(kingdom)
+
+
+    # Lawrence's implementation
+    # while not areAllSurrendered(adjacency_array):
+    #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+    # conquered_kingdoms_indices.pop(0)
 
     conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
 
-
-    # This part still doesn't work, need to fix how we are making the graph G
     G = adjacency_matrix_to_graph(adjacency_matrix)
-    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices)
+    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices + [starting_kingdom_index])
     # for node, datadict in st.nodes.items():
     #     print(node)
-    
+
+    # DFS to build a path from steiner tree
+    # print(conquered_kingdoms)
+
+    closed_walk = []
 
     return closed_walk, conquered_kingdoms
 
