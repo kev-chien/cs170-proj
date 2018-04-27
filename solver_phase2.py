@@ -35,8 +35,9 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     dict_kingdom_index_to_cost = {i: adjacency_matrix[i][i] for i in range(N)}
 
-
-    ##### Steiner Tree Algorithm
+    ################################################################
+    ##### STEINER TREE ALGORITHM ###################################
+    ################################################################
 
     ### greedy solution: sort in some way and add the "optimal" conquering kingdom
 
@@ -76,7 +77,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # adjacency_array = np.array(adjacency_matrix)
     # conquered_kingdoms_indices = ["dummy"]
     # while not areAllSurrendered(adjacency_array):
-    #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+    # conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
     # conquered_kingdoms_indices.pop(0)
 
     # print(tuples_kingdom_name_to_self_cost)
@@ -101,7 +102,8 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
             for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
                 set_surrendered_indices.add(kingdom)
 
-    # remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
+    ### remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
+
     # first sort kingdoms by conquer cost
     # check kingdom X:
     # check if at least one neighbor is in set to conquer (so X itself surrenders)
@@ -122,6 +124,10 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices + [starting_kingdom_index])
     # for node, datadict in st.nodes.items():
     #     print(node)
+
+    ####################################################################
+    ##### DFS PATH FROM STEINER TREE ###################################
+    ####################################################################
 
     # DFS to build a path from steiner tree
     # print(conquered_kingdoms)
