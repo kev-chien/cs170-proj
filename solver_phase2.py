@@ -175,18 +175,41 @@ def solve_all(input_directory, output_directory, params=[]):
     for input_file in input_files:
         solve_from_file(input_file, output_directory, params=params)
 
+def solve_all_from_list(input_directory, output_directory, list_file_name, params=[]):
+    files = []
 
-if __name__=="__main__":
+    with open(list_file_name) as f:
+        filenames = f.read().splitlines()
+
+    for name in os.listdir(input_directory):
+        if name.endswith("in") and name in filenames:
+            files.append(f'{input_directory}/{name}')
+
+    for input_file in files:
+        solve_from_file(input_file, output_directory, params=params)
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
-    parser.add_argument('--all', action='store_true', help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
-    parser.add_argument('input', type=str, help='The path to the input file or directory')
-    parser.add_argument('output_directory', type=str, nargs='?', default='.', help='The path to the directory where the output should be written')
-    parser.add_argument('params', nargs=argparse.REMAINDER, help='Extra arguments passed in')
+    parser.add_argument('--all', action='store_true',
+                        help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
+    parser.add_argument('--fromlist', action='store_true',
+                        help='If specified, olve all the files give an input file describing a list of files (in params)')
+    parser.add_argument('input', type=str, help='The path to the input file or directory or input_list')
+    parser.add_argument('output_directory', type=str, nargs='?', default='.',
+                        help='The path to the directory where the output should be written')
+    parser.add_argument('params', nargs=argparse.REMAINDER,
+                        help='Extra arguments passed in (file of the list of files)')
     args = parser.parse_args()
     output_directory = args.output_directory
     if args.all:
+        print(args.all)
         input_directory = args.input
         solve_all(input_directory, output_directory, params=args.params)
+    elif args.fromlist:
+        # Example: python3 solver_template.py --fromlist inputs outputs-astar files_up_to_size/inputs_lim_15
+        input_directory = args.input
+        input_list_file = args.params[0]
+        solve_all_from_list(input_directory, output_directory, input_list_file, params=args.params)
     else:
         input_file = args.input
         solve_from_file(input_file, output_directory, params=args.params)
