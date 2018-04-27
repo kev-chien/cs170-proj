@@ -124,7 +124,10 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
 
     G = adjacency_matrix_to_graph(adjacency_matrix)
-    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices + [starting_kingdom_index])
+    special_nodes = conquered_kingdoms_indices
+    if starting_kingdom_index not in special_nodes:
+        special_nodes.append(starting_kingdom_index)
+    st = nx.algorithms.approximation.steinertree.steiner_tree(G, special_nodes)
 
     visited = []
     validator = []
@@ -132,7 +135,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
         visited.append(False)
     count = 0
     visited_order = []
-    print(st[1])
+
     def dfs(visited_list, curr_kingdom, visited_order_list, counting):
         visited[curr_kingdom] = True
         counting = counting + 1
@@ -142,15 +145,19 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
                 dfs(visited_list, x, visited_order, counting)
                 if(counting != len(st)):
                         visited_order_list.append(curr_kingdom)
-    dfs(visited, starting_kingdom_index, visited_order, count)
-    original_graph = adjacency_matrix_to_graph(adjacency_matrix)
-    print(visited_order)
-    return_path = nx.algorithms.astar_path(original_graph, visited_order.pop(len(visited_order)-1), starting_kingdom_index)
-    visited_order.extend(return_path)
+
+    if len(conquered_kingdoms_indices) == 1:
+        visited_order = conquered_kingdoms_indices
+    else:
+        dfs(visited, starting_kingdom_index, visited_order, count)
+        original_graph = adjacency_matrix_to_graph(adjacency_matrix)
+        # print(visited_order)
+        return_path = nx.algorithms.astar_path(original_graph, visited_order.pop(len(visited_order)-1), starting_kingdom_index)
+        visited_order.extend(return_path)
     # for node, datadict in st.nodes.items():
     #     print(node)
-    print(return_path)
-    print(visited_order)
+    # print(return_path)
+    # print(visited_order)
 
     closed_walk = [dict_kingdom_index_to_name[i] for i in visited_order]
 
