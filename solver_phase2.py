@@ -25,26 +25,21 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     Output:
         Return 2 things. The first is a list of kingdoms representing the walk, and the second is the set of kingdoms that are conquered
     """
+    # Potentially useful tools
     N = len(list_of_kingdom_names)
-    KINGDOM_POSS = 2 ** N
-    # G = nx.from_numpy_matrix(np.array(adjacency_matrix))
-
     dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
     dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
-
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
-
     starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
-
     dict_kingdom_index_to_cost = {i: adjacency_matrix[i][i] for i in range(N)}
 
     ################################################################
     ##### STEINER TREE ALGORITHM ###################################
     ################################################################
 
-    ### greedy solution: sort in some way and add the "optimal" conquering kingdom
+    ### Greedy solution: sort in some way and add the "optimal" conquering kingdom
 
-    ## attempt #1: sort using Dijkstra's
+    ## Attempt #1: sort using Dijkstra's
     G = nx.Graph()
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
     dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
@@ -61,9 +56,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
             G.add_edge(dict_kingdom_index_to_name[i], dict_kingdom_index_to_name[j], weight=adjacency_matrix[i][j])
 
     # Run dijkstras from the start node
-    # spt = nx.algorithms.single_source_dijkstra_path(G, starting_kingdom)
     shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
-    # print(shortest_paths_lengths)
 
     tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     tuples_kingdom_name_to_total_cost = [(tup[0], tup[1] + shortest_paths_lengths[tup[0]]) for tup in tuples_kingdom_name_to_self_cost]
@@ -74,18 +67,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_total_cost]
     # sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_self_cost]
 
-    ### upon some sorted greedy strategy, add kingdoms to conquer in this order
-
-    # Lawrence's implementation
-    # adjacency_array = np.array(adjacency_matrix)
-    # conquered_kingdoms_indices = ["dummy"]
-    # while not areAllSurrendered(adjacency_array):
-    # conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
-    # conquered_kingdoms_indices.pop(0)
-
-    # print(tuples_kingdom_name_to_self_cost)
-    # print(tuples_kingdom_name_to_total_cost)
-    # print(sorted_kingdom_tuples_by_cost)
+    ### Upon some sorted greedy strategy, add kingdoms to conquer in this order
 
     # Kevin's implementation
     set_surrendered_indices = set()
@@ -105,7 +87,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
             for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
                 set_surrendered_indices.add(kingdom)
 
-    ### remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
+    ### Remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
 
     # first sort kingdoms by conquer cost
     # check kingdom X:
@@ -130,7 +112,6 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     st = nx.algorithms.approximation.steinertree.steiner_tree(G, special_nodes)
 
     visited = []
-    validator = []
     for _ in range(len(adjacency_lists)):
         visited.append(False)
     count = 0

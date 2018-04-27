@@ -122,6 +122,12 @@ def mapKingdomtoCost(G, list_of_kingdom_names):
         cost_to_conquer_dict[kingdom] = getKingdomCost(G, kingdom)
     return cost_to_conquer_dict
 
+# Lawrence's implementation
+# adjacency_array = np.array(adjacency_matrix)
+# conquered_kingdoms_indices = ["dummy"]
+# while not areAllSurrendered(adjacency_array):
+# conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+# conquered_kingdoms_indices.pop(0)
 
 
 if __name__ == '__main__':
