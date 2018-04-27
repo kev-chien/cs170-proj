@@ -28,13 +28,13 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     N = len(list_of_kingdom_names)
     KINGDOM_POSS = 2 ** N
     # G = nx.from_numpy_matrix(np.array(adjacency_matrix))
-    adjacency_array = np.array(adjacency_matrix)
 
     dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
     dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
 
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
-    
+    dict_kingdom_index_to_cost = {i: adjacency_matrix[i][i] for i in range(N)}
+
     starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
 
     # print(list_of_kingdom_names)
@@ -50,8 +50,15 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # Steiner Tree Algorithm
     sorted_kingdom_tuples_by_cost = sorted(tuples_kingdom_name_to_cost, key=lambda x: x[1])
     sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_cost]
-    # conquered_kingdoms_indices = ["dummy"]
 
+    # greedy solution: add cheapest kingdom that is unconquered and adds surrendered kingdoms
+
+    # Lawrence's implementation
+    # adjacency_array = np.array(adjacency_matrix)
+    # conquered_kingdoms_indices = ["dummy"]
+    # while not areAllSurrendered(adjacency_array):
+    #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+    # conquered_kingdoms_indices.pop(0)
 
     # Kevin's implementation
     set_surrendered_indices = set()
@@ -71,12 +78,21 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
             for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
                 set_surrendered_indices.add(kingdom)
 
+    # remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
+    # first sort kingdoms by conquer cost
+    # check kingdom X:
+    # check if at least one neighbor is in set to conquer (so X itself surrenders)
+    # for each neighbor, check if it is conquered or has at least neighbor in set to conquer
 
-    # Lawrence's implementation
-    # while not areAllSurrendered(adjacency_array):
-    #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
-    # conquered_kingdoms_indices.pop(0)
-
+    # def has_conquered_neighbors(kingdom):
+    #     return any(neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X])
+    #
+    # set_conquered_kingdoms_indices = set(conquered_kingdoms_indices)
+    # for X in reversed(sorted(conquered_kingdoms_indices, key=lambda i: dict_kingdom_index_to_cost[i])):
+    #     if has_conquered_neighbors(X)\
+    #             and all(has_conquered_neighbors(neighbor) or neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X] if neighbor != X):
+    #         set_conquered_kingdoms_indices.remove(X)
+    #
     conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
 
     G = adjacency_matrix_to_graph(adjacency_matrix)
