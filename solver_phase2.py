@@ -33,14 +33,13 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
 
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
-    
+
     starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
 
     # print(list_of_kingdom_names)
     # print(starting_kingdom)
     # print(adjacency_matrix)
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
-    # print(adjacency_lists)
 
     # Our graph G has nodes of tuples, form:
     # 0: kingdom_index (0 to n-1)
@@ -49,20 +48,59 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # Steiner Tree Algorithm
     sorted_kingdom_tuples_by_cost = sorted(tuples_kingdom_name_to_cost, key=lambda x: x[1])
     sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_cost]
-    conquered_kingdoms_indices = ["dummy"]
-    while not areAllSurrendered(adjacency_array):
-        conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
-    conquered_kingdoms_indices.pop(0)
 
+    set_surrendered_indices = set()
+    conquered_kingdoms_indices = []
+    while len(set_surrendered_indices) < N:
+        # pop of next
+        tentative_conquer_name = sorted_kingdom_names.pop(0)
+        tentative_conquer_index = dict_kingdom_name_to_index[tentative_conquer_name]
+        # test if conquering actually forces new kingdoms to surrender
+        helpful = False
+        for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+            if kingdom not in set_surrendered_indices:
+                helpful = True
+                break
+        if helpful:
+            conquered_kingdoms_indices.append(tentative_conquer_index)
+            for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+                set_surrendered_indices.add(kingdom)
+    #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
+    # conquered_kingdoms_indices.pop(0)
     conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
 
 
     # This part still doesn't work, need to fix how we are making the graph G
     G = adjacency_matrix_to_graph(adjacency_matrix)
-    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices)
+    st = nx.algorithms.approximation.steinertree.steiner_tree(G, conquered_kingdoms_indices + [starting_kingdom_index])
+
+    visited = []
+    validator = []
+    for _ in range(len(adjacency_lists)):
+        visited.append(False)
+    count = 0
+    visited_order = []
+    print(st[1])
+    def dfs(visited_list, curr_kingdom, visited_order_list, counting):
+        visited[curr_kingdom] = True
+        counting = counting + 1
+        visited_order_list.append(curr_kingdom)
+        for x in st[curr_kingdom]:
+            if visited_list[x] == False:
+                dfs(visited_list, x, visited_order, counting)
+                if(counting != len(st)):
+                        visited_order_list.append(curr_kingdom)
+    dfs(visited, starting_kingdom_index, visited_order, count)
+    original_graph = adjacency_matrix_to_graph(adjacency_matrix)
+    print(visited_order)
+    return_path = nx.algorithms.astar_path(original_graph, visited_order.pop(len(visited_order)-1), starting_kingdom_index)
+    visited_order.extend(return_path)
     # for node, datadict in st.nodes.items():
     #     print(node)
-    
+    print(return_path)
+    print(visited_order)
+
+    closed_walk = [dict_kingdom_index_to_name[i] for i in visited_order]
 
     return closed_walk, conquered_kingdoms
 
@@ -76,7 +114,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
 
 def solve_from_file(input_file, output_directory, params=[]):
     print('Processing', input_file)
-    
+
     input_data = utils.read_file(input_file)
     number_of_kingdoms, list_of_kingdom_names, starting_kingdom, adjacency_matrix = data_parser(input_data)
     closed_walk, conquered_kingdoms = solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=params)
