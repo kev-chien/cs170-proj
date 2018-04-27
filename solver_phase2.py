@@ -35,23 +35,42 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     dict_kingdom_index_to_cost = {i: adjacency_matrix[i][i] for i in range(N)}
 
-    starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
 
-    # print(list_of_kingdom_names)
-    # print(starting_kingdom)
-    # print(adjacency_matrix)
+    ##### Steiner Tree Algorithm
+
+    ### greedy solution: sort in some way and add the "optimal" conquering kingdom
+
+    ## attempt #1: sort using Dijkstra's
+    G = nx.Graph()
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
-    # print(adjacency_lists)
+    dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
+    dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
 
-    # Our graph G has nodes of tuples, form:
-    # 0: kingdom_index (0 to n-1)
-    # 1: kingdoms_state which describes which kingdoms have surrendered in binary
+    # Create G
+    # Populate nodes in the graph
+    for kingdom_name in list_of_kingdom_names:
+        G.add_node(kingdom_name)
 
-    # Steiner Tree Algorithm
-    sorted_kingdom_tuples_by_cost = sorted(tuples_kingdom_name_to_cost, key=lambda x: x[1])
-    sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_cost]
+    # Populate edges in the graph
+    for i in range(N):
+        for j in adjacency_lists[i]:
+            G.add_edge(dict_kingdom_index_to_name[i], dict_kingdom_index_to_name[j], weight=adjacency_matrix[i][j])
 
-    # greedy solution: add cheapest kingdom that is unconquered and adds surrendered kingdoms
+    # Run dijkstras from the start node
+    # spt = nx.algorithms.single_source_dijkstra_path(G, starting_kingdom)
+    shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
+    # print(shortest_paths_lengths)
+
+    tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
+    tuples_kingdom_name_to_total_cost = [(tup[0], tup[1] + shortest_paths_lengths[tup[0]]) for tup in tuples_kingdom_name_to_self_cost]
+
+    starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
+    sorted_kingdom_tuples_by_self_cost = sorted(tuples_kingdom_name_to_self_cost, key=lambda x: x[1]) # for sorting greedily using kingdom cost
+    sorted_kingdom_tuples_by_total_cost = sorted(tuples_kingdom_name_to_total_cost, key=lambda x: x[1]) # for sorting greedily using djikstra's cost
+    sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_total_cost]
+    # sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_self_cost]
+
+    ### upon some sorted greedy strategy, add kingdoms to conquer in this order
 
     # Lawrence's implementation
     # adjacency_array = np.array(adjacency_matrix)
@@ -59,6 +78,10 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     # while not areAllSurrendered(adjacency_array):
     #     conquered_kingdoms, adjacency_array = conquer(adjacency_array, dict_kingdom_name_to_index[sorted_kingdom_names.pop(0)], conquered_kingdoms_indices)
     # conquered_kingdoms_indices.pop(0)
+
+    # print(tuples_kingdom_name_to_self_cost)
+    # print(tuples_kingdom_name_to_total_cost)
+    # print(sorted_kingdom_tuples_by_cost)
 
     # Kevin's implementation
     set_surrendered_indices = set()
