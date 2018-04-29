@@ -5,7 +5,6 @@ sys.path.append('../..')
 import argparse
 import utils
 from student_utils_sp18 import *
-import numpy as np
 
 """
 ======================================================================

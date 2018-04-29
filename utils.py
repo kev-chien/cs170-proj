@@ -30,8 +30,10 @@ def write_data_to_file(file, data, separator, append=False):
     else:
         mode = 'w'
     with open(file, mode) as f:
-        for item in data:
-            f.write(f'{item}{separator}')
+        for i in range(len(data)):
+            f.write(f'{data[i]}')
+            if i != len(data) - 1:
+                f.write(f'{separator}')
 
 
 def input_to_output(input_file):
