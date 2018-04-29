@@ -96,14 +96,12 @@ def naiveGreedy(list_of_kingdom_names, adjacency_matrix, dict_kingdom_name_to_in
     tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     sorted_kingdom_tuples_by_self_cost = sorted(tuples_kingdom_name_to_self_cost, key=lambda x: x[1])
     order = [tup[0] for tup in sorted_kingdom_tuples_by_self_cost]
-    conquerKingdoms(order, adjacency_matrix, len(list_of_kingdom_names), dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
-    return order
+    conquered_kingdoms = conquerKingdoms(order, adjacency_matrix, len(list_of_kingdom_names), dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    return conquered_kingdoms
 
 
 def dijkstrasGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name):
     """Order kingdoms by the length of the shortest path from the starting kingdom to it + cost to conquer"""
-    # print(adjacency_matrix)
-    # print([adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])
     G = buildGraph(list_of_kingdom_names, adjacency_matrix, dict_kingdom_index_to_name)
     shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
     tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
@@ -169,6 +167,7 @@ def conquerKingdoms(order, adjacency_matrix, N, dict_kingdom_name_to_index, dict
     return conquered_kingdoms
 
 def buildGraph(list_of_kingdom_names, adjacency_matrix, dict_kingdom_index_to_name):
+    """Builds graph using adjacency matrix"""
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
     G = nx.Graph()
     for kingdom_name in list_of_kingdom_names:
