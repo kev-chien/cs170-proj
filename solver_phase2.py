@@ -25,86 +25,32 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     Output:
         Return 2 things. The first is a list of kingdoms representing the walk, and the second is the set of kingdoms that are conquered
     """
-    # Potentially useful tools
+    ### TOOLKIT ###
     N = len(list_of_kingdom_names)
     dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
     dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
     tuples_kingdom_name_to_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
     starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
     dict_kingdom_index_to_cost = {i: adjacency_matrix[i][i] for i in range(N)}
-
-    ################################################################
-    ##### STEINER TREE ALGORITHM ###################################
-    ################################################################
-
-    ### Greedy solution: sort in some way and add the "optimal" conquering kingdom
-
-    ## Attempt #1: sort using Dijkstra's
-    G = nx.Graph()
     adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
-    dict_kingdom_index_to_name = {i: name for i, name in enumerate(list_of_kingdom_names)}
-    dict_kingdom_name_to_index = {name: i for i, name in enumerate(list_of_kingdom_names)}
 
-    # Create G
-    # Populate nodes in the graph
-    for kingdom_name in list_of_kingdom_names:
-        G.add_node(kingdom_name)
+    ###################################
+    ##### STEINER TREE ALGORITHM ######
+    ###################################
 
-    # Populate edges in the graph
-    for i in range(N):
-        for j in adjacency_lists[i]:
-            G.add_edge(dict_kingdom_index_to_name[i], dict_kingdom_index_to_name[j], weight=adjacency_matrix[i][j])
+    ## --- STEP 1: FIND KINGDOMS TO CONQUER --- ##
 
-    # Run dijkstras from the start node
-    shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
+    # NOTE: You can comment out some if you don't want the algorithms to run for some
+    naive_greedy_conquered_kingdoms = naiveGreedy(list_of_kingdom_names, adjacency_matrix, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    dijkstras_greedy_conquered_kingdoms = dijkstrasGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    dijkstras_degree_greedy_conquered_kingdoms = dijkstrasAndDegreeGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
 
-    tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
-    tuples_kingdom_name_to_total_cost = [(tup[0], tup[1] + shortest_paths_lengths[tup[0]]) for tup in tuples_kingdom_name_to_self_cost]
+    # TODO: Choose one of the above sets of conquered kingdoms
+    conquered_kingdoms = dijkstras_degree_greedy_conquered_kingdoms
+    conquered_kingdoms_indices = [dict_kingdom_name_to_index[i] for i in conquered_kingdoms]
 
-    starting_kingdom_index = dict_kingdom_name_to_index[starting_kingdom]
-    sorted_kingdom_tuples_by_self_cost = sorted(tuples_kingdom_name_to_self_cost, key=lambda x: x[1]) # for sorting greedily using kingdom cost
-    sorted_kingdom_tuples_by_total_cost = sorted(tuples_kingdom_name_to_total_cost, key=lambda x: x[1]) # for sorting greedily using djikstra's cost
-    sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_total_cost]
-    # sorted_kingdom_names = [tup[0] for tup in sorted_kingdom_tuples_by_self_cost]
 
-    ### Upon some sorted greedy strategy, add kingdoms to conquer in this order
-
-    # Kevin's implementation
-    set_surrendered_indices = set()
-    conquered_kingdoms_indices = []
-    while len(set_surrendered_indices) < N:
-        # pop of next
-        tentative_conquer_name = sorted_kingdom_names.pop(0)
-        tentative_conquer_index = dict_kingdom_name_to_index[tentative_conquer_name]
-        # test if conquering actually forces new kingdoms to surrender
-        helpful = False
-        for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
-            if kingdom not in set_surrendered_indices:
-                helpful = True
-                break
-        if helpful:
-            conquered_kingdoms_indices.append(tentative_conquer_index)
-            for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
-                set_surrendered_indices.add(kingdom)
-
-    ### Remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
-
-    # first sort kingdoms by conquer cost
-    # check kingdom X:
-    # check if at least one neighbor is in set to conquer (so X itself surrenders)
-    # for each neighbor, check if it is conquered or has at least neighbor in set to conquer
-
-    # def has_conquered_neighbors(kingdom):
-    #     return any(neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X])
-    #
-    # set_conquered_kingdoms_indices = set(conquered_kingdoms_indices)
-    # for X in reversed(sorted(conquered_kingdoms_indices, key=lambda i: dict_kingdom_index_to_cost[i])):
-    #     if has_conquered_neighbors(X)\
-    #             and all(has_conquered_neighbors(neighbor) or neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X] if neighbor != X):
-    #         set_conquered_kingdoms_indices.remove(X)
-    #
-    conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
-
+    ## --- STEP 2: FIND PATH THROUGH KINGDOMS TO CONQUER --- ##
     G = adjacency_matrix_to_graph(adjacency_matrix)
     special_nodes = conquered_kingdoms_indices
     if starting_kingdom_index not in special_nodes:
@@ -133,18 +79,107 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     else:
         dfs(starting_kingdom_index)
         original_graph = adjacency_matrix_to_graph(adjacency_matrix)
-        # print(visited_order)
         return_path = nx.algorithms.astar_path(original_graph, visited_order.pop(len(visited_order)-1), starting_kingdom_index)
         visited_order.extend(return_path)
-    # for node, datadict in st.nodes.items():
-    #     print(node)
-    # print(return_path)
-    # print(visited_order)
 
     closed_walk = [dict_kingdom_index_to_name[i] for i in visited_order]
 
     return closed_walk, conquered_kingdoms
 
+
+###########################################
+## --- KINGDOM CONQUERING STRATEGIES --- ##
+###########################################
+
+def naiveGreedy(list_of_kingdom_names, adjacency_matrix, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name):
+    """Order kingdoms by increasing cost to conquer"""
+    tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
+    sorted_kingdom_tuples_by_self_cost = sorted(tuples_kingdom_name_to_self_cost, key=lambda x: x[1])
+    order = [tup[0] for tup in sorted_kingdom_tuples_by_self_cost]
+    conquerKingdoms(order, adjacency_matrix, len(list_of_kingdom_names), dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    return order
+
+
+def dijkstrasGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name):
+    """Order kingdoms by the length of the shortest path from the starting kingdom to it + cost to conquer"""
+    # print(adjacency_matrix)
+    # print([adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])
+    G = buildGraph(list_of_kingdom_names, adjacency_matrix, dict_kingdom_index_to_name)
+    shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
+    tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
+    tuples_kingdom_name_to_total_cost = [(tup[0], tup[1] + shortest_paths_lengths[tup[0]]) for tup in tuples_kingdom_name_to_self_cost]
+    sorted_kingdom_tuples_by_total_cost = sorted(tuples_kingdom_name_to_total_cost, key=lambda x: x[1])
+    order = [tup[0] for tup in sorted_kingdom_tuples_by_total_cost]
+    conquered_kingdoms = conquerKingdoms(order, adjacency_matrix, len(list_of_kingdom_names), dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    return conquered_kingdoms
+
+
+def dijkstrasAndDegreeGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name):
+    """Order kingdoms by dijkstra's greedy cost divided by the degree of the kingdom"""
+    G = buildGraph(list_of_kingdom_names, adjacency_matrix, dict_kingdom_index_to_name)
+    shortest_paths_lengths = nx.algorithms.single_source_dijkstra_path_length(G, starting_kingdom)
+    tuples_kingdom_name_to_self_cost = [(name, cost) for name, cost in zip(list_of_kingdom_names, [adjacency_matrix[i][i] for i in range(len(list_of_kingdom_names))])]
+    tuples_kingdom_name_to_total_cost = [(kingdom, (cost + shortest_paths_lengths[kingdom]) / countNeighbors(kingdom, adjacency_matrix, dict_kingdom_name_to_index)) for kingdom, cost in tuples_kingdom_name_to_self_cost]
+    sorted_kingdom_tuples_by_total_cost = sorted(tuples_kingdom_name_to_total_cost, key=lambda x: x[1])
+    order = [kingdom for kingdom, cost in sorted_kingdom_tuples_by_total_cost]
+    conquered_kingdoms = conquerKingdoms(order, adjacency_matrix, len(list_of_kingdom_names), dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    return conquered_kingdoms
+
+def countNeighbors(kingdom, adjacency_matrix, dict_kingdom_name_to_index):
+    """Counts number of neighbors of a kingdom, helper function for dijstrasAndDegreeGreedy + 1"""
+    kingdom_index = dict_kingdom_name_to_index[kingdom]
+    neighbors = adjacency_matrix[kingdom_index]
+    return sum(neighbor != 'x' for neighbor in neighbors) + 1
+
+
+## -- KINGDOM CONQUERING TOOLKIT -- ##
+
+def conquerKingdoms(order, adjacency_matrix, N, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name):
+    """Conquers kingdoms until all surrendered.
+    Remove most expensive kingdoms that lead to over-conquering (i.e. don't need to be conquered)
+    1) First sort kingdoms by conquer cost
+    2) Check kingdom X:
+    3) Check if at least one neighbor is in set to conquer (so X itself surrenders)
+    4) For each neighbor, check if it is conquered or has at least neighbor in set to conquer"""
+    adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
+    set_surrendered_indices = set()
+    conquered_kingdoms_indices = []
+    while len(set_surrendered_indices) < N:
+        # pop of next
+        tentative_conquer_name = order.pop(0)
+        tentative_conquer_index = dict_kingdom_name_to_index[tentative_conquer_name]
+        # test if conquering actually forces new kingdoms to surrender
+        helpful = False
+        for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+            if kingdom not in set_surrendered_indices:
+                helpful = True
+                break
+        if helpful:
+            conquered_kingdoms_indices.append(tentative_conquer_index)
+            for kingdom in adjacency_lists[tentative_conquer_index] + [tentative_conquer_index]:
+                set_surrendered_indices.add(kingdom)
+
+    set_conquered_kingdoms_indices = set(conquered_kingdoms_indices)
+    has_conquered_neighbors = lambda X: any(neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X])
+    for X in reversed(sorted(conquered_kingdoms_indices, key=lambda i: dict_kingdom_index_to_cost[i])):
+        if has_conquered_neighbors(X) and all(has_conquered_neighbors(neighbor) or neighbor in set_conquered_kingdoms_indices for neighbor in adjacency_lists[X] if neighbor != X):
+            set_conquered_kingdoms_indices.remove(X)
+
+    conquered_kingdoms = [dict_kingdom_index_to_name[i] for i in conquered_kingdoms_indices]
+    return conquered_kingdoms
+
+def buildGraph(list_of_kingdom_names, adjacency_matrix, dict_kingdom_index_to_name):
+    adjacency_lists = adjacency_matrix_to_adjacency_lists(adjacency_matrix)
+    G = nx.Graph()
+    for kingdom_name in list_of_kingdom_names:
+        G.add_node(kingdom_name)
+
+    # Populate edges in the graph
+    for i in range(len(list_of_kingdom_names)):
+        for j in adjacency_lists[i]:
+            G.add_edge(dict_kingdom_index_to_name[i], dict_kingdom_index_to_name[j], weight=adjacency_matrix[i][j])
+
+    return G
 
 """
 ======================================================================
