@@ -32,7 +32,7 @@ def adjacency_matrix_to_graph(adjacency_matrix):
     
     for i in range(len(adjacency_matrix_formatted)):
         adjacency_matrix_formatted[i][i] = 0
-    
+
     G = nx.convert_matrix.from_numpy_matrix(np.matrix(adjacency_matrix_formatted))
     
     for node, datadict in G.nodes.items():
