@@ -117,20 +117,21 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     count = 0
     visited_order = []
 
-    def dfs(visited_list, curr_kingdom, visited_order_list, counting):
+    def dfs(curr_kingdom):
         visited[curr_kingdom] = True
-        counting = counting + 1
-        visited_order_list.append(curr_kingdom)
+        nonlocal count
+        count += 1
+        visited_order.append(curr_kingdom)
         for x in st[curr_kingdom]:
-            if visited_list[x] == False:
-                dfs(visited_list, x, visited_order, counting)
-                if(counting != len(st)):
-                        visited_order_list.append(curr_kingdom)
+            if not visited[x]:
+                dfs(x)
+                if(count != len(st)):
+                    visited_order.append(curr_kingdom)
 
     if len(conquered_kingdoms_indices) == 1:
         visited_order = conquered_kingdoms_indices
     else:
-        dfs(visited, starting_kingdom_index, visited_order, count)
+        dfs(starting_kingdom_index)
         original_graph = adjacency_matrix_to_graph(adjacency_matrix)
         # print(visited_order)
         return_path = nx.algorithms.astar_path(original_graph, visited_order.pop(len(visited_order)-1), starting_kingdom_index)
