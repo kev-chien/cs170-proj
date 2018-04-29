@@ -41,8 +41,8 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     ## --- STEP 1: FIND KINGDOMS TO CONQUER --- ##
 
     # NOTE: You can comment out some if you don't want the algorithms to run for some
-    naive_greedy_conquered_kingdoms = naiveGreedy(list_of_kingdom_names, adjacency_matrix, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
-    dijkstras_greedy_conquered_kingdoms = dijkstrasGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    # naive_greedy_conquered_kingdoms = naiveGreedy(list_of_kingdom_names, adjacency_matrix, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
+    # dijkstras_greedy_conquered_kingdoms = dijkstrasGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
     dijkstras_degree_greedy_conquered_kingdoms = dijkstrasAndDegreeGreedy(list_of_kingdom_names, adjacency_matrix, starting_kingdom, dict_kingdom_name_to_index, dict_kingdom_index_to_cost, dict_kingdom_index_to_name)
 
     # TODO: Choose one of the above sets of conquered kingdoms
