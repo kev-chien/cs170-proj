@@ -5,7 +5,7 @@ sys.path.append('../..')
 import argparse
 import utils
 from student_utils_sp18 import *
-# from queue import Queue
+from pyChristofides import christofides
 
 """
 ======================================================================
@@ -217,10 +217,28 @@ def steinerDFS(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conque
 
 def christoTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conquered_kingdoms_indices,
         N, dict_kingdom_index_to_name, dict_kingdom_name_to_index, tuples_kingdom_name_to_cost, starting_kingdom_index, dict_kingdom_index_to_cost, adjacency_lists):
+    
+    # build TSP distance matrix to represent each node in conquered_kingdoms_indices
+    # contain edges of weight based on shortest path
     G = adjacency_matrix_to_graph(adjacency_matrix)
-    special_nodes = conquered_kingdoms_indices
+    shortest_paths = nx.algorithms.all_pairs_shortest_path(G)
+    shortest_lengths = nx.algorithms.all_pairs_shortest_path_length(G)
+
+    N_TSP = len(conquered_kingdoms_indices)
+    dict_TSP_index_to_index = { TSP_index: index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
+    dict_index_to_TSP_index = { index: TSP_index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
+
+    distance_matrix = [[0 for _ in range(N_TSP)] for _ in range(N_TSP)]
+
+    for i in range(N_TSP):
+        for j in range(i + 1, N_TSP):
+            distance_matrix[i][j] = shortest_lengths[i][j]
     closed_walk = []
 
+    # run christofides
+    # NOTE: to install pyChristofides, cd in to python-christofides, run `python3 setup.py install`
+    TSP = christofides.compute(distance_matrix)
+    print(TSP['Christofides_Solution'])
     return closed_walk
 
 """
