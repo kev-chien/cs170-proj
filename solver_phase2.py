@@ -6,7 +6,6 @@ import argparse
 import utils
 from student_utils_sp18 import *
 sys.path.insert(0, './python-christofides-0.1.2')
-from pyChristofides import christofides
 
 """
 ======================================================================
