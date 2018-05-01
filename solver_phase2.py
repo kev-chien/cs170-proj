@@ -34,7 +34,6 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
 
     dict_path_strategies = {
         'steiner-DFS': steinerDFS,
-        'christo-TSP': christoTSP,
         'concorde-TSP': concordeTSP
     }
 
@@ -214,40 +213,6 @@ def steinerDFS(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conque
     return closed_walk
 
 
-## -- CHRISTOFIDES TSP STRATEGY -- ##
-
-def christoTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conquered_kingdoms_indices,
-        N, dict_kingdom_index_to_name, dict_kingdom_name_to_index, tuples_kingdom_name_to_cost, starting_kingdom_index, dict_kingdom_index_to_cost, adjacency_lists):
-    
-    # build TSP distance matrix to represent each node in conquered_kingdoms_indices
-    # contain edges of weight based on shortest path
-    G = adjacency_matrix_to_graph(adjacency_matrix)
-    shortest_paths = dict(nx.shortest_path(G, weight="weight"))
-    shortest_lengths = dict(nx.shortest_path_length(G, weight="weight"))
-
-    N_TSP = len(conquered_kingdoms_indices)
-    dict_TSP_index_to_index = { TSP_index: index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
-    dict_index_to_TSP_index = { index: TSP_index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
-
-    distance_matrix = [[0] * N_TSP] * N_TSP
-    print(N_TSP)
-
-    print(shortest_lengths)
-    print(distance_matrix)
-
-    for i in range(N_TSP):
-        for j in range(i + 1, N_TSP):
-            print(i, j, shortest_lengths[i][j])
-            distance_matrix[i][j] = shortest_lengths[i][j]
-    closed_walk = []
-
-    print(distance_matrix)
-
-    # run christofides
-
-    return closed_walk
-
-
 ## -- CONCORDE TSP STRATEGY -- ##
 
 def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conquered_kingdoms_indices,
@@ -262,17 +227,28 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
     shortest_lengths = dict(nx.shortest_path_length(G, weight="weight"))
     shortest_paths = dict(nx.shortest_path(G, weight="weight"))
 
+    # print(shortest_lengths)
+
     N_TSP = len(special_nodes)
     dict_TSP_index_to_index = {TSP_index: index for TSP_index, index in enumerate(special_nodes)}
     dict_index_to_TSP_index = {index: TSP_index for TSP_index, index in enumerate(special_nodes)}
 
-    distance_matrix = [[0] * N_TSP] * N_TSP
+    distance_matrix = [[0 for _ in range(N_TSP)] for _ in range(N_TSP)]
+
+    # print(special_nodes)
 
     upper_bound = 2**31
     for i in range(N_TSP):
         for j in range(N_TSP):
-            edge_weight = int(shortest_lengths[i][j] + 1)
-            distance_matrix[i][j] = edge_weight if edge_weight < upper_bound else upper_bound
+            if i != j:
+                edge_weight = int(round(shortest_lengths[dict_TSP_index_to_index[i]][dict_TSP_index_to_index[j]] + 1))
+                distance_matrix[i][j] = min(edge_weight, upper_bound)
+            else:
+                distance_matrix[i][j] = 0
+
+
+    # print(distance_matrix)
+
 
     # run TSP concorde
     matrix_sym = atsp_tsp(distance_matrix, strategy="avg")
@@ -288,13 +264,13 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
     # stitch path together
     edge_list = tour_to_list_of_edges(tour_G)
     print(edge_list)
-    stiched_tour = [edge_list[0][0]] # starting node
+    stitched_tour = [edge_list[0][0]] # starting node
     edge_list.append((edge_list[-1][1], starting_kingdom_index))
     for i, j in edge_list:
-        stiched_tour.extend(shortest_paths[i][j][1:])
-    
+        stitched_tour.extend(shortest_paths[i][j][1:])
 
-    closed_walk = [dict_kingdom_index_to_name[index] for index in stiched_tour]
+
+    closed_walk = [dict_kingdom_index_to_name[index] for index in stitched_tour]
     print(closed_walk)
 
     return closed_walk
