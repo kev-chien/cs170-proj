@@ -18,19 +18,15 @@ def analyze_from_file(input_file, output_file, params=[]):
     # code from output_validator
     input_data = utils.read_file(input_file)
     output_data = utils.read_file(output_file)
-    print(input_data)
 
-    if input_data == []:
+    # print(output_data)
+
+    if output_data == []:
         print('empty file detected')
-    if input_data[0] == 'Error':
+        return -1,-1,-1
+    if output_data[0] == ['Error'] or output_data[0] == 'Error':
         print('error file detected')
-
-    # print(input_data)
-
-    if input_data == []:
-        print('empty file detected')
-    if 'Error' in input_data:
-        print('error file detected')
+        return -1,-1,-1
 
     number_of_kingdoms, list_of_kingdom_names, starting_kingdom, adjacency_matrix = data_parser(input_data)
     G = adjacency_matrix_to_graph(adjacency_matrix)
@@ -74,6 +70,8 @@ def analyze_all(output_directory, costs_directory, params=[]):
                 continue
             num, ext = name.split(".")
             t_cost, c_cost, cost = analyze_from_file(f'inputs/{num}.in', f'{output_directory}/{name}', params=params)
+            if cost == -1:
+                continue
             line_data = [output_directory, name, t_cost, c_cost, cost]
             utils.write_to_file(costs_file, '\n', append=True)
             utils.write_data_to_file(costs_file, line_data, ',', append=True)
