@@ -18,6 +18,12 @@ def analyze_from_file(input_file, output_file, params=[]):
     # code from output_validator
     input_data = utils.read_file(input_file)
     output_data = utils.read_file(output_file)
+    print(input_data)
+
+    if input_data == []:
+        print('empty file detected')
+    if input_data[0] == 'Error':
+        print('error file detected')
 
     number_of_kingdoms, list_of_kingdom_names, starting_kingdom, adjacency_matrix = data_parser(input_data)
     G = adjacency_matrix_to_graph(adjacency_matrix)

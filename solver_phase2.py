@@ -260,11 +260,11 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
 
         # convert to original indices
         tour_G = [dict_TSP_index_to_index[TSP_index] for TSP_index in tour["tour"]]
-        print(tour_G)
+        # print(tour_G)
 
         # stitch path together
         edge_list = tour_to_list_of_edges(tour_G)
-        print(edge_list)
+        # print(edge_list)
         stiched_tour = [edge_list[0][0]] # starting node
         edge_list.append((edge_list[-1][1], starting_kingdom_index))
         for i, j in edge_list:
@@ -274,7 +274,7 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
         closed_walk = [dict_kingdom_index_to_name[index] for index in stiched_tour]
     except:
         closed_walk = "Error"
-    print(closed_walk)
+    # print(closed_walk)
 
     return closed_walk
 
@@ -288,7 +288,7 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
 
 
 def solve_from_file(input_file, output_directory, params=[]):
-    print('Processing', input_file)
+    # print('Processing', input_file)
 
     input_data = utils.read_file(input_file)
     number_of_kingdoms, list_of_kingdom_names, starting_kingdom, adjacency_matrix = data_parser(input_data)

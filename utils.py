@@ -36,7 +36,7 @@ def write_data_to_file(file, data, separator, append=False):
             myString += f'{data[i]}'
             if i != len(data) - 1:
                 f.write(f'{separator}')
-                myString += f'{data[i]}'
+                myString += f'{separator}'
     print(myString)
 
 
