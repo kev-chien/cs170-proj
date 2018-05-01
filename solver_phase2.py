@@ -254,26 +254,48 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
         N, dict_kingdom_index_to_name, dict_kingdom_name_to_index, tuples_kingdom_name_to_cost, starting_kingdom_index, dict_kingdom_index_to_cost, adjacency_lists):
 
     # Build TSP Distance matrix
+    special_nodes = conquered_kingdoms_indices
+    if starting_kingdom_index not in special_nodes:
+        special_nodes.append(starting_kingdom_index)
+
     G = adjacency_matrix_to_graph(adjacency_matrix)
     shortest_lengths = dict(nx.shortest_path_length(G, weight="weight"))
+    shortest_paths = dict(nx.shortest_path(G, weight="weight"))
 
-    N_TSP = len(conquered_kingdoms_indices)
-    dict_TSP_index_to_index = {TSP_index: index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
-    dict_index_to_TSP_index = {index: TSP_index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
+    N_TSP = len(special_nodes)
+    dict_TSP_index_to_index = {TSP_index: index for TSP_index, index in enumerate(special_nodes)}
+    dict_index_to_TSP_index = {index: TSP_index for TSP_index, index in enumerate(special_nodes)}
 
     distance_matrix = [[0] * N_TSP] * N_TSP
 
+    upper_bound = 2**31
     for i in range(N_TSP):
         for j in range(N_TSP):
-            distance_matrix[i][j] = shortest_lengths[i][j]
+            edge_weight = int(shortest_lengths[i][j] + 1)
+            distance_matrix[i][j] = edge_weight if edge_weight < upper_bound else upper_bound
 
+    # run TSP concorde
     matrix_sym = atsp_tsp(distance_matrix, strategy="avg")
     outf = "/tmp/myroute.tsp"
     with open(outf, 'w') as dest:
         dest.write(dumps_matrix(matrix_sym, name="My Route"))
-    tour = run(outf, start=1, solver="concorde")
+    tour = run(outf, start=dict_index_to_TSP_index[starting_kingdom_index], solver="concorde")
 
-    closed_walk = [dict_kingdom_index_to_name[dict_TSP_index_to_index[TSP_index]] for TSP_index in tour["tour"]]
+    # convert to original indices
+    tour_G = [dict_TSP_index_to_index[TSP_index] for TSP_index in tour["tour"]]
+    print(tour_G)
+
+    # stitch path together
+    edge_list = tour_to_list_of_edges(tour_G)
+    print(edge_list)
+    stiched_tour = [edge_list[0][0]] # starting node
+    edge_list.append((edge_list[-1][1], starting_kingdom_index))
+    for i, j in edge_list:
+        stiched_tour.extend(shortest_paths[i][j][1:])
+    
+
+    closed_walk = [dict_kingdom_index_to_name[index] for index in stiched_tour]
+    print(closed_walk)
 
     return closed_walk
 
