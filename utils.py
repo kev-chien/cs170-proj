@@ -29,11 +29,15 @@ def write_data_to_file(file, data, separator, append=False):
         mode = 'a'
     else:
         mode = 'w'
+    myString = ''
     with open(file, mode) as f:
         for i in range(len(data)):
             f.write(f'{data[i]}')
+            myString += f'{data[i]}'
             if i != len(data) - 1:
                 f.write(f'{separator}')
+                myString += f'{data[i]}'
+    print(myString)
 
 
 def input_to_output(input_file):

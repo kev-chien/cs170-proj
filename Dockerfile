@@ -20,7 +20,9 @@ RUN pip install git+https://github.com/perrygeo/pytsp
 ENV NAME TSP-Solver
 
 # Test python TSP concorde when the container launches
-CMD ["python", "tsp_concorde_ex.py"]
+# CMD ["python", "tsp_concorde_ex.py"]
+
+CMD ["tail", "solver_phase2.py"]
 
 # Run solver when the container launches
 # CMD ["python", "solver_phase2.py", "in/50_kevin.in"]

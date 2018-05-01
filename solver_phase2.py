@@ -279,22 +279,25 @@ def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conqu
     outf = "/tmp/myroute.tsp"
     with open(outf, 'w') as dest:
         dest.write(dumps_matrix(matrix_sym, name="My Route"))
-    tour = run(outf, start=dict_index_to_TSP_index[starting_kingdom_index], solver="concorde")
+    try:
+        tour = run(outf, start=dict_index_to_TSP_index[starting_kingdom_index], solver="concorde")
 
-    # convert to original indices
-    tour_G = [dict_TSP_index_to_index[TSP_index] for TSP_index in tour["tour"]]
-    print(tour_G)
+        # convert to original indices
+        tour_G = [dict_TSP_index_to_index[TSP_index] for TSP_index in tour["tour"]]
+        print(tour_G)
 
-    # stitch path together
-    edge_list = tour_to_list_of_edges(tour_G)
-    print(edge_list)
-    stiched_tour = [edge_list[0][0]] # starting node
-    edge_list.append((edge_list[-1][1], starting_kingdom_index))
-    for i, j in edge_list:
-        stiched_tour.extend(shortest_paths[i][j][1:])
-    
+        # stitch path together
+        edge_list = tour_to_list_of_edges(tour_G)
+        print(edge_list)
+        stiched_tour = [edge_list[0][0]] # starting node
+        edge_list.append((edge_list[-1][1], starting_kingdom_index))
+        for i, j in edge_list:
+            stiched_tour.extend(shortest_paths[i][j][1:])
+        
 
-    closed_walk = [dict_kingdom_index_to_name[index] for index in stiched_tour]
+        closed_walk = [dict_kingdom_index_to_name[index] for index in stiched_tour]
+    except:
+        closed_walk = "Error"
     print(closed_walk)
 
     return closed_walk
@@ -315,14 +318,17 @@ def solve_from_file(input_file, output_directory, params=[]):
     number_of_kingdoms, list_of_kingdom_names, starting_kingdom, adjacency_matrix = data_parser(input_data)
     closed_walk, conquered_kingdoms = solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=params)
 
-    basename, filename = os.path.split(input_file)
-    output_filename = utils.input_to_output(filename)
-    output_file = f'{output_directory}/{output_filename}'
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
-    utils.write_data_to_file(output_file, closed_walk, ' ')
-    utils.write_to_file(output_file, '\n', append=True)
-    utils.write_data_to_file(output_file, conquered_kingdoms, ' ', append=True)
+    if closed_walk == "Error":
+        print("Error")
+    else:
+        basename, filename = os.path.split(input_file)
+        output_filename = utils.input_to_output(filename)
+        output_file = f'{output_directory}/{output_filename}'
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+        utils.write_data_to_file(output_file, closed_walk, ' ')
+        utils.write_to_file(output_file, '\n', append=True)
+        utils.write_data_to_file(output_file, conquered_kingdoms, ' ', append=True)
 
 
 def solve_all(input_directory, output_directory, params=[]):
