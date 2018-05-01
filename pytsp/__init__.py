@@ -16,7 +16,7 @@ class TSPSolverNotFound(IOError):
     pass
 
 
-def atsp_tsp(matrix, strategy="avg"):
+def atsp_tsp(matrix, strategy="avg", upper_bound=32768.0):
     """ convert an asymterical tsp to symetrical
     """
 
@@ -25,10 +25,11 @@ def atsp_tsp(matrix, strategy="avg"):
     if strategy == 'avg':
         rarr = np.flipud(np.rot90(arr))
         avg = ((arr + rarr) / 2)
-        # keep it < 32768 to stay within 16bit int
-        scale = 32768.0 / avg.max()
-        if scale > 1.0:
-            scale = 1.0
+        # keep it < max
+        # default is keep it < 32768 to stay within 16bit int
+        scale = upper_bound / avg.max()
+        # if scale > 1.0:
+        #     scale = 1.0
         avg = (avg * scale).astype('i')
         return avg
 
