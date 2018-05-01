@@ -5,7 +5,7 @@ sys.path.append('../..')
 import argparse
 import utils
 from student_utils_sp18 import *
-sys.path.insert(0, './python-christofides-0.1.2')
+from pytsp import atsp_tsp, run, dumps_matrix
 
 """
 ======================================================================
@@ -34,13 +34,14 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
 
     dict_path_strategies = {
         'steiner-DFS': steinerDFS,
-        'christo-TSP': christoTSP
+        'christo-TSP': christoTSP,
+        'concorde-TSP': concordeTSP
     }
 
     if len(params) == 0:
         params.append('dijkstras-degree')
     if len(params) < 2:
-        params.append('steiner-DFS')
+        params.append('concorde-TSP')
 
     conquer_strategy = dict_conquer_strategies[params[0]]
     path_strategy = dict_path_strategies[params[1]]
@@ -245,6 +246,38 @@ def christoTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conque
     # run christofides
 
     return closed_walk
+
+
+## -- CONCORDE TSP STRATEGY -- ##
+
+def concordeTSP(list_of_kingdom_names, starting_kingdom, adjacency_matrix, conquered_kingdoms_indices,
+        N, dict_kingdom_index_to_name, dict_kingdom_name_to_index, tuples_kingdom_name_to_cost, starting_kingdom_index, dict_kingdom_index_to_cost, adjacency_lists):
+
+    # Build TSP Distance matrix
+    G = adjacency_matrix_to_graph(adjacency_matrix)
+    shortest_lengths = dict(nx.shortest_path_length(G, weight="weight"))
+
+    N_TSP = len(conquered_kingdoms_indices)
+    dict_TSP_index_to_index = {TSP_index: index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
+    dict_index_to_TSP_index = {index: TSP_index for TSP_index, index in enumerate(conquered_kingdoms_indices)}
+
+    distance_matrix = [[0] * N_TSP] * N_TSP
+
+    for i in range(N_TSP):
+        for j in range(N_TSP):
+            distance_matrix[i][j] = shortest_lengths[i][j]
+
+    matrix_sym = atsp_tsp(distance_matrix, strategy="avg")
+    outf = "/tmp/myroute.tsp"
+    with open(outf, 'w') as dest:
+        dest.write(dumps_matrix(matrix_sym, name="My Route"))
+    tour = run(outf, start=1, solver="concorde")
+
+    closed_walk = [dict_kingdom_index_to_name[dict_TSP_index_to_index[TSP_index]] for TSP_index in tour["tour"]]
+
+    return closed_walk
+
+
 
 """
 ======================================================================
