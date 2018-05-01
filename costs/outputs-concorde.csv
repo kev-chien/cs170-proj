@@ -1,0 +1,8 @@
+output_dir,output_filename,travel_cost,conquer_cost,cost
+outputs-concorde,539.out,11766.0,2816.0,14582.0
+outputs-concorde,511.out,1035279.3649000002,3500123785.57053,3501159064.93543
+outputs-concorde,277.out,548.0,781.0,1329.0
+outputs-concorde,263.out,1272.0,424.0,1696.0
+outputs-concorde,505.out,42.0,4.0,46.0
+outputs-concorde,288.out,738.0,369.0,1107.0
+outputs-concorde,129.out,4591.0,3122.0,7713.0

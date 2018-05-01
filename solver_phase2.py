@@ -40,7 +40,7 @@ def solve(list_of_kingdom_names, starting_kingdom, adjacency_matrix, params=[]):
     if len(params) == 0:
         params.append('dijkstras-degree')
     if len(params) < 2:
-        params.append('concorde-TSP')
+        params.append('steiner-DFS')
 
     conquer_strategy = dict_conquer_strategies[params[0]]
     path_strategy = dict_path_strategies[params[1]]
